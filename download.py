@@ -1,5 +1,6 @@
 import os
 import pytubefix
+import re
 
 def search(url):
     """
@@ -25,7 +26,10 @@ def search(url):
         "originalStream": streams
     }
 
-def download_video(url, itag, output_path="Downloads"):
+def download_video(url, itag, download_folder):
+    if not os.path.isdir(download_folder):
+        print("The folder path is invalid or doesn't exist. Please check the path and try again.")
+        return
     try:
         video = pytubefix.YouTube(url=url)
         stream = video.streams.get_by_itag(itag)
@@ -35,8 +39,12 @@ def download_video(url, itag, output_path="Downloads"):
             return
 
         print(f"Downloading {video.title}...")
-        stream.download(output_path)
-        filename = f"{output_path}/{video.title}.{stream.subtype}"
-        print(f"Download complete. File saved to: {os.path.abspath(filename)}")
+        sanitized_title = re.sub(r'[<>:"/\\|?*]', '', video.title)
+        file_path = os.path.join(download_folder, f"{sanitized_title}.{stream.subtype}")
+        stream.download(output_path=download_folder, filename=f"{sanitized_title}.{stream.subtype}")
+        if os.path.exists(file_path):
+            print(f"Download complete. File saved to: {os.path.abspath(file_path)}")
+        else:
+            print("Download failed.")
     except Exception as e:
         print(f"Error: {e}")

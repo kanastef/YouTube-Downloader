@@ -13,7 +13,8 @@ def main():
         for stream in video_data["streams"]:
             print(f"{stream.itag}: {stream.mime_type} - {stream.resolution or 'Audio'}")
         itag = input("\nEnter the itag of the stream you want to download: ")
-        download_video(url, int(itag))
+        download_folder = input("\nEnter the folder path for the download: ")
+        download_video(url, int(itag), download_folder)
     except Exception as e:
         print(f"Error: {e}")
 
