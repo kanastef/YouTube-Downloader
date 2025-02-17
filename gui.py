@@ -32,10 +32,17 @@ class YTDownloaderGUI:
         self.streams_combobox.pack(pady=5)
 
         self.download_button = tk.Button(root, text="Download", command=self.start_download, state="disabled")
+        self.download_button.pack(pady=10)
 
+        self.folder_path = tk.StringVar()
+        self.browse_button = tk.Button(root, text="Select a folder for the download: ", command=self.select_folder)
+        self.browse_button.pack(pady=5)
 
+        self.folder_label = tk.Label(root, textvariable=self.folder_path, font=("Arial", 12))
+        self.folder_label.pack(pady=5)
 
-
+        self.progress_bar = ttk.Progressbar(root, length=300, mode="determinate")
+        self.progress_bar.pack(pady=5)
 
     def fetch_video_data(self):
         url = self.url_entry.get()
@@ -65,5 +72,32 @@ class YTDownloaderGUI:
         self.streams_combobox.current(0)
         self.download_button.config(state="normal")
 
-def start_download(self):
-    return
+    def select_folder(self):
+        folder = filedialog.askdirectory()
+        if folder:
+            self.folder_path.set(folder)
+
+    def start_download(self):
+        selected_index = self.streams_combobox.current()
+        if selected_index == -1:
+            messagebox.showerror("Error", "Please select a format to download.")
+            return
+
+        itag = self.streams[selected_index].itag
+        folder = self.folder_path.get()
+        if not folder:
+            messagebox.showerror("Error", "Please select a download folder.")
+            return
+
+        self.download_button.config(state="disabled")
+        self.progress_bar["value"] = 10
+        self.root.update_idletasks()
+        try:
+            download_video(self.url_entry.get(), itag, folder)
+            self.progress_bar["value"] = 100
+            messagebox.showinfo("Success", "Download completed successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Download failed: {e}")
+        finally:
+            self.download_button.config(state="normal")
+            self.progress_bar["value"] = 0
