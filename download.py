@@ -10,6 +10,7 @@ def search(url):
     :param url: The URL of the YouTube video
 
     :return: A dictionary containing the previously mentioned information about the video.
+
     """
     video = pytube.YouTube(url=url)
     streams = video.streams
@@ -22,3 +23,18 @@ def search(url):
         "title": video.title,
         "originalStream": streams
     }
+
+def download_video(url, itag, output_path="downloads"):
+    try:
+        video = pytube.YouTube(url=url)
+        stream = video.streams.get_by_itag(itag)
+
+        if not stream:
+            print("Invalid itag selected: ")
+            return
+
+        print("Downloading {video.title}...")
+        stream.download(output_path)
+        print("Download complete!")
+    except Exception as e:
+        print(f"Error: {e}")
