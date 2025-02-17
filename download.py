@@ -6,8 +6,15 @@ def search(url):
     """
     Fetches video information and available streams from a given YouTube URL.
 
-    This function retrieves metadata (title and thumbnail URL) and filters
-    available streams to include only MP4 video and audio formats.
+    This function retrieves the video title, thumbnail URL, and available streams.
+    The streams are categorized into:
+    - **Combined streams**: Contain both video and audio.
+    - **Video-only streams**: Do not include audio.
+    - **Audio-only streams**: Contain only the audio track.
+
+    Streams are sorted in descending order:
+    - Video streams are sorted by resolution (highest to lowest).
+    - Audio streams are sorted by bitrate (highest to lowest).
 
     :param url: The URL of the YouTube video
 
@@ -38,6 +45,20 @@ def search(url):
         return None
 
 def download_video(url, itag, download_folder):
+    """
+    Downloads a YouTube video or audio stream based on the selected itag.
+
+    This function retrieves the specified stream by its itag, downloads it to the given folder,
+    and saves it with a sanitized filename.
+
+    If the specified folder does not exist, the function notifies the user and exits.
+    If the download is successful, it confirms the saved file location. Otherwise, it displays an error message.
+
+    :param url: The URL of the YouTube video.
+    :param itag: The itag of the desired stream (used to identify a specific quality/format).
+    :param download_folder: The path to the folder where the file will be saved.
+
+    """
     if not os.path.isdir(download_folder):
         print("The folder path is invalid or doesn't exist. Please check the path and try again.")
         return
