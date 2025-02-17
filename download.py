@@ -1,4 +1,5 @@
-import pytube
+import os
+import pytubefix
 
 def search(url):
     """
@@ -12,7 +13,7 @@ def search(url):
     :return: A dictionary containing the previously mentioned information about the video.
 
     """
-    video = pytube.YouTube(url=url)
+    video = pytubefix.YouTube(url=url)
     streams = video.streams
     return {
         "streams":
@@ -24,17 +25,18 @@ def search(url):
         "originalStream": streams
     }
 
-def download_video(url, itag, output_path="downloads"):
+def download_video(url, itag, output_path="Downloads"):
     try:
-        video = pytube.YouTube(url=url)
+        video = pytubefix.YouTube(url=url)
         stream = video.streams.get_by_itag(itag)
 
         if not stream:
             print("Invalid itag selected: ")
             return
 
-        print("Downloading {video.title}...")
+        print(f"Downloading {video.title}...")
         stream.download(output_path)
-        print("Download complete!")
+        filename = f"{output_path}/{video.title}.{stream.subtype}"
+        print(f"Download complete. File saved to: {os.path.abspath(filename)}")
     except Exception as e:
         print(f"Error: {e}")

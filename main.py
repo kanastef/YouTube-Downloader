@@ -1,16 +1,21 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from download import *
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def main():
+    print("Welcome to YTDownloader!")
+    url = input("Enter the YouTube Video URL: ")
+    try:
+        video_data = search(url)
+        print(f"\nTitle: {video_data['title']}")
+        print(f"Thumbnail: {video_data['thumbnail_url']}")
 
+        print("Available formats: ")
+        for stream in video_data["streams"]:
+            print(f"{stream.itag}: {stream.mime_type} - {stream.resolution or 'Audio'}")
+        itag = input("\nEnter the itag of the stream you want to download: ")
+        download_video(url, int(itag))
+    except Exception as e:
+        print(f"Error: {e}")
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    main()
