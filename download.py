@@ -14,17 +14,28 @@ def search(url):
     :return: A dictionary containing the previously mentioned information about the video.
 
     """
-    video = pytubefix.YouTube(url=url)
-    streams = video.streams
-    return {
-        "streams":
-            [stream for stream in streams
-            if stream.mime_type == "video/mp4"
-            or stream.mime_type == "audio/mp4"],
-        "thumbnail_url": video.thumbnail_url,
-        "title": video.title,
-        "originalStream": streams
-    }
+    try:
+        video = pytubefix.YouTube(url=url)
+        streams = video.streams
+        video_streams = [s for s in streams if s.type == 'video' and not s.includes_audio_track]
+        audio_streams = [s for s in streams if s.type == 'audio']
+        combined_streams = [s for s in streams if s.type == 'video' and s.includes_audio_track]
+        sorted_video_streams = sorted(video_streams, key=lambda s: (int(s.resolution.replace('p', '') if s.resolution else 0)), reverse=True)
+        sorted_audio_streams = sorted(audio_streams, key=lambda s: (int(s.abr.replace('kbps', '') if s.abr else 0)),
+                                      reverse=True)
+        sorted_combined_streams = sorted(combined_streams,
+                                         key=lambda s: (int(s.resolution.replace('p', '') if s.resolution else 0)),
+                                         reverse=True)
+        return {
+            "streams":
+                sorted_combined_streams + sorted_video_streams + sorted_audio_streams,
+            "thumbnail_url": video.thumbnail_url,
+            "title": video.title,
+            "originalStream": streams
+        }
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def download_video(url, itag, download_folder):
     if not os.path.isdir(download_folder):
